@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+
+  "name": "UtubeTo",
+  "description": "youtube url to google sheet attr",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "youtube-icon.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab"
+  ]
+}
