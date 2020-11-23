@@ -1,10 +1,8 @@
-/*
-let thisToken;
+
 window.onload = function() {
 	document.querySelector('button').addEventListener('click', function() {
 		chrome.identity.getAuthToken({interactive: true}, function(token) {
-			thisToken = token;
-			alert(token);
+
 		});
 	});
 
@@ -31,4 +29,4 @@ window.onload = function() {
 		});
 	};
 	onGAPILoad();
-};*/
+};
