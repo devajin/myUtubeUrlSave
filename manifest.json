@@ -2,12 +2,13 @@
   "manifest_version": 2,
   "name": "UtubeTo",
   "description": "youtube url to google sheet attr",
-  "version": "1.1",
+  "version": "1.23",
 
   "background": {
     "page": "popup.html",
     "persistent": false
   },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqd5EYpzyLLUFeQYKvbnYH4ChtRHxLeYwbGewpxGsynORqJ8rk6m5gmo5LMQhSGA3EmgpfSp9Uvb51Smi+/tRytq8AOqlJXTqo4S2V+cAxjnw6v7Ls65eHs/gRimUgGAFKOdP7p432B7Z+9Kf6JbvKs/1JhIaqPkRAEv2Dta+HizJ90aI8NvxLJIv+3hjnmokLeRPkwFfqx6jdNHvAEecJx7STavMeXrW4wKylbQisryrA2s+6DZ6Fv8I9hvK0L61G+EuvKwktoMiG2DPa7vhs337tKcziXctRVIg1fWxSqqsrX5egOdNXbuyJRB5lOMtsSNqSmJ73XokFRnUl6bbVwIDAQAB",
   "browser_action": {
     "default_icon": "images/youtube-icon.png"
   },
@@ -17,7 +18,7 @@
     "storage"
   ],
   "oauth2": {
-    "client_id": "1004533533575-5pbgjp8c01cnro4v466ke55ig78vnioa.apps.googleusercontent.com",
+    "client_id": "1004533533575-j97jvg0p3c927ht7h8rg584eqbedqjnr.apps.googleusercontent.com",
     "scopes":["https://www.googleapis.com/auth/spreadsheets"]
   }
 
