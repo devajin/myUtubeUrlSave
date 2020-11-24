@@ -3,11 +3,8 @@
   "name": "UtubeTo",
   "description": "youtube url to google sheet attr",
   "version": "1.23",
-
   "background": {
-    "scripts": [
-      "background.js"
-    ],
+    "page": "background.html",
     "persistent": false
   },
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqd5EYpzyLLUFeQYKvbnYH4ChtRHxLeYwbGewpxGsynORqJ8rk6m5gmo5LMQhSGA3EmgpfSp9Uvb51Smi+/tRytq8AOqlJXTqo4S2V+cAxjnw6v7Ls65eHs/gRimUgGAFKOdP7p432B7Z+9Kf6JbvKs/1JhIaqPkRAEv2Dta+HizJ90aI8NvxLJIv+3hjnmokLeRPkwFfqx6jdNHvAEecJx7STavMeXrW4wKylbQisryrA2s+6DZ6Fv8I9hvK0L61G+EuvKwktoMiG2DPa7vhs337tKcziXctRVIg1fWxSqqsrX5egOdNXbuyJRB5lOMtsSNqSmJ73XokFRnUl6bbVwIDAQAB",
@@ -18,12 +15,10 @@
   "content_security_policy": "script-src 'self' https://apis.google.com/; object-src 'self'",
   "permissions": [
     "identity",
-    "storage"
+    "https://www.googleapis.com/auth/spreadsheets"
   ],
   "oauth2": {
     "client_id": "1004533533575-j97jvg0p3c927ht7h8rg584eqbedqjnr.apps.googleusercontent.com",
-    "scopes":["https://www.googleapis.com/auth/spreadsheets"]
+    "scopes":["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
   }
-
-
 }

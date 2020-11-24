@@ -1,32 +1,23 @@
+let createSheetBtn = document.getElementById("sheetUpdateBtn");
 
-window.onload = function() {
-	document.querySelector('button').addEventListener('click', function() {
-		chrome.identity.getAuthToken({interactive: true}, function(token) {
-
+document.onload = (() => {
+	console.log("onload...");
+	chrome.runtime.sendMessage({"message":"loadMySheet"}, (response)=> {
+		console.log("app.js response list :: ", response)
+		let sheetPage = response.mySheet.files;
+		let selectBox = document.getElementById("mySheet");
+		sheetPage.forEach((sheet) =>{
+			console.log(this);
+			$(selectBox).append(`<option value=${sheet.id}>${sheet.name}</option>`)
 		});
-	});
+		$(selectBox).niceSelect();
+	})
+})();
 
-	const API_KEY = 'AIzaSyAsTfYFL0isLr9pppKSaz9IMQ16MnUB1YA';
-	const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+createSheetBtn.addEventListener("click", (e)=>{
+	let data = {};
+	console.log(data);
+	chrome.runtime.sendMessage({"data" : data, "message":"sheetUpdate"}, (response)=>console.log(`app.js response`, response))
+})
 
-	function onGAPILoad() {
-		gapi.client.init({
-			// Don't pass client nor scope as these will init auth2, which we don't want
-			apiKey: API_KEY,
-			discoveryDocs: DISCOVERY_DOCS,
-		}).then(function () {
-			console.log(thisToken);
-			console.log('gapi initialized')
-			chrome.identity.getAuthToken({interactive: true}, function(token) {
-				console.log(token)
-				gapi.auth.setToken({
-					'access_token': token,
-				});
 
-			})
-		}, function(error) {
-			console.log('error', error)
-		});
-	};
-	onGAPILoad();
-};
