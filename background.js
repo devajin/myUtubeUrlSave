@@ -32,7 +32,18 @@ chrome.extension.onMessage.addListener(
 						console.log(res);
 						sendResponse({"mySheet" : res });
 					});
-			}else if(request.message === 'createSheet'){
+			}
+			if(request.message === "getSheets"){
+				const sheetId = request.sheetId;
+				gapi.client.sheets.spreadsheets.get({
+					spreadsheetId: sheetId
+				}).then(function(response) {
+					sendResponse(response.result.sheets)
+				}, function(response) {
+					console.log('Error: ' + response.result.error.message);
+				});
+
+			} else if(request.message === 'createSheet'){
 				console.log(`sendResponse : > ${sendResponse}`);
 				gapi.client.sheets.spreadsheets.create({
 					properties: {
