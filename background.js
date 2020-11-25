@@ -1,16 +1,12 @@
 const API_KEY = 'AIzaSyAsTfYFL0isLr9pppKSaz9IMQ16MnUB1YA';
 const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",
 	"https://www.googleapis.com/drive/v3/drives?q=mimeType='application/vnd.google-apps.spreadsheet'"];
-const SPREADSHEET_ID = '1HVzgXTbqBG5NKwvu1JeroUJwnHlVmhr9vbwBXpygZng';
-const SPREADSHEET_TAB_NAME = 'main';
-
 
 function onGAPILoad() {
 	gapi.client.init({
 		apiKey: API_KEY,
 		discoveryDocs: DISCOVERY_DOCS
 	});
-
 }
 
 chrome.extension.onMessage.addListener(
@@ -24,7 +20,7 @@ chrome.extension.onMessage.addListener(
 
 			if(request.message === "loadMySheet"){
 				const pageToken = request.pageToken || "";
-				fetch(`https://www.googleapis.com/drive/v3/files?corpora=user&pageSize=10&q=mimeType='application/vnd.google-apps.spreadsheet'&key=${API_KEY}&pageToken=${pageToken}`, {
+				fetch(`https://www.googleapis.com/drive/v3/files?corpora=user&pageSize=10&q=mimeType='application/vnd.google-apps.spreadsheet' and 'me' in owners&key=${API_KEY}&pageToken=${pageToken}`, {
 						headers: {Authorization: `Bearer ${token}`}
 					})
 					.then(res => res.json())
@@ -41,6 +37,7 @@ chrome.extension.onMessage.addListener(
 					sendResponse(response.result.sheets)
 				}, function(response) {
 					console.log('Error: ' + response.result.error.message);
+					sendResponse(response.result.error.code);
 				});
 
 			} else if(request.message === 'createSheet'){
@@ -55,24 +52,45 @@ chrome.extension.onMessage.addListener(
 
 
 			}else if(request.message === 'sheetUpdate'){
-				const body = {values: [[
-						new Date(), // Timestamp
-						request.data.title, // Page title
-						request.data.url, // Page URl
-					]]};
-				console.log(body);
 
+				console.log("background....")
+				console.log(request.data);
+				console.log(request.youtubeSheetInfo)
 				// Append values to the spreadsheet
 				gapi.client.sheets.spreadsheets.values.append({
-					spreadsheetId: SPREADSHEET_ID,
-					range: SPREADSHEET_TAB_NAME,
+					spreadsheetId: request.youtubeSheetInfo.SPREADSHEET_ID,
+					range: request.youtubeSheetInfo.SPREADSHEET_TAB_NAME,
 					valueInputOption: 'USER_ENTERED',
-					resource: body
+					resource: request.data
 				}).then((response) => {
 					// On success
 					console.log(`${response.result.updates.updatedCells} cells appended.`)
-					sendResponse({success: true});
 				});
+				/*gapi.client.sheets.spreadsheets.values.batchUpdate({
+					spreadsheetId : request.youtubeSheetInfo.SPREADSHEET_ID,
+					//TODO : json 데이터 형식이 안맞음 예시가 너무 없음.
+					requests: [{
+							autoResizeDimensions: {
+								dimensions: {
+									sheetId: 1078576150,
+									dimension: "COLUMNS",
+									startIndex: 0,
+									endIndex : 3
+								}
+							}
+						}]
+				}).then(response =>{
+					console.log(response)
+				})*/
+
+			}else if(request.message === 'getYoutubeInfo'){
+				const youtubeId = request.youtubeId || "";
+				fetch(`https://youtube.googleapis.com/youtube/v3/videos?part=snippet&id=${youtubeId}&key=${API_KEY}`, {})
+					.then(res => res.json())
+					.then(res => {
+						console.log(res);
+						sendResponse({"resYoutubeInfo" : res });
+					});
 			}
 
 		})
