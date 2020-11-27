@@ -12,7 +12,7 @@ function onGAPILoad() {
 chrome.extension.onMessage.addListener(
 	function(request, sender, sendResponse) {
 		// Get the token
-		chrome.identity.getAuthToken({interactive: true}, function(token) {
+		chrome.identity.getAuthToken({interactive: true},  function(token) {
 			// Set GAPI auth token
 			gapi.auth.setToken({
 				'access_token': token,
@@ -46,43 +46,61 @@ chrome.extension.onMessage.addListener(
 					properties: {
 						title: title
 					}
-				}).then((response) => {
+				}).then( (response) => {
 					console.log(response)
 				});
 
 
-			}else if(request.message === 'sheetUpdate'){
-
-				console.log("background....")
-				console.log(request.data);
-				console.log(request.youtubeSheetInfo)
+			}else if(request.message === 'typeYoutubeSheetUpdate') {
 				// Append values to the spreadsheet
 				gapi.client.sheets.spreadsheets.values.append({
 					spreadsheetId: request.youtubeSheetInfo.SPREADSHEET_ID,
 					range: request.youtubeSheetInfo.SPREADSHEET_TAB_NAME,
 					valueInputOption: 'USER_ENTERED',
 					resource: request.data
+				}).then(async (response) => {
+					// On success
+
+					try {
+						await updateSheetStyle(request, token);
+						sendResponse(response.result);
+						console.log(response.result)
+						console.log(`${response.result.updates.updatedCells} cells appended.`)
+					}catch (e){
+						console.log(e);
+					}
+
+
+				});
+
+			}else if (request.message === 'typeNormalSheetUpdate'){
+				gapi.client.sheets.spreadsheets.values.append({
+					spreadsheetId: request.sheetInfo.SPREADSHEET_ID,
+					range: request.sheetInfo.SPREADSHEET_TAB_NAME,
+					valueInputOption: 'USER_ENTERED',
+					resource: request.data
 				}).then((response) => {
 					// On success
+					fetch(`https://sheets.googleapis.com/v4/spreadsheets/${request.sheetInfo.SPREADSHEET_ID}:batchUpdate`, {
+						method: 'POST',
+						headers: {Authorization: `Bearer ${token}`},
+						body: JSON.stringify({
+							"requests": [
+								{
+									"autoResizeDimensions": {
+										"dimensions": {
+											"sheetId": request.sheetInfo.SPREADSHEET_TAB_ID,
+											"dimension": "COLUMNS"
+										}
+									}
+								}
+							]
+						})
+					}).then((res) => {return res.json()})
+
+					sendResponse(response.result);
 					console.log(`${response.result.updates.updatedCells} cells appended.`)
 				});
-				/*gapi.client.sheets.spreadsheets.values.batchUpdate({
-					spreadsheetId : request.youtubeSheetInfo.SPREADSHEET_ID,
-					//TODO : json 데이터 형식이 안맞음 예시가 너무 없음.
-					requests: [{
-							autoResizeDimensions: {
-								dimensions: {
-									sheetId: 1078576150,
-									dimension: "COLUMNS",
-									startIndex: 0,
-									endIndex : 3
-								}
-							}
-						}]
-				}).then(response =>{
-					console.log(response)
-				})*/
-
 			}else if(request.message === 'getYoutubeInfo'){
 				const youtubeId = request.youtubeId || "";
 				fetch(`https://youtube.googleapis.com/youtube/v3/videos?part=snippet&id=${youtubeId}&key=${API_KEY}`, {})
@@ -99,3 +117,49 @@ chrome.extension.onMessage.addListener(
 		return true;
 	}
 );
+
+async function updateSheetStyle(request, token){
+	return  fetch(`https://sheets.googleapis.com/v4/spreadsheets/${request.youtubeSheetInfo.SPREADSHEET_ID}:batchUpdate`, {
+		method: 'POST',
+		headers: {Authorization: `Bearer ${token}`},
+		body: JSON.stringify({
+			"requests": [
+				{
+					"updateDimensionProperties": {
+						"range": {
+							"sheetId": request.youtubeSheetInfo.SPREADSHEET_TAB_ID,
+							"dimension": "COLUMNS",
+							"startIndex": 2,
+							"endIndex": 3
+						},"properties": {
+							"pixelSize": request.thumbnail.width
+						},
+						"fields": "pixelSize"
+					}
+				},
+				{
+					"updateDimensionProperties": {
+						"range": {
+							"sheetId": request.youtubeSheetInfo.SPREADSHEET_TAB_ID,
+							"dimension": "ROWS"
+						},
+						"properties": {
+							"pixelSize": request.thumbnail.height
+						},
+						"fields": "pixelSize"
+					}
+				},
+				{
+					"autoResizeDimensions": {
+						"dimensions": {
+							"sheetId": request.youtubeSheetInfo.SPREADSHEET_TAB_ID,
+							"dimension": "COLUMNS"
+						}
+					}
+				}
+			]
+		})
+	})
+	.then((res) => {return res.json()})
+
+}

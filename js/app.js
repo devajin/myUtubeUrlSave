@@ -18,7 +18,8 @@ document.onload = (() => {
 
 	$mySheetSelectBox.on("change",function (){
 		const sheetId = $(this).val();
-		if(sheetId !== "Nothing"){
+		console.log(sheetId);
+		if(sheetId !== "0"){
 			$('#overlay').fadeIn();
 			chrome.runtime.sendMessage({"sheetId": sheetId ,"message":"getSheets"}, (response)=> {
 				let sheetArray = response;
@@ -29,13 +30,15 @@ document.onload = (() => {
 				$myInnerSheetSelectBox.niceSelect('destroy').niceSelect();  // TODO : 이부분 변경해야 함 두번 호출됨 ;;
 				$('#overlay').fadeOut();
 			});
+			$("#sheetUpdateBtn").prop("disabled", false);
 		}else {
+
 			$myInnerSheetSelectBox.empty();
 			$myInnerSheetSelectBox.append(`<option data-display="Select" value="0" disabled>Nothing</option>`)
 
-
 			$myInnerSheetSelectBox.niceSelect('destroy').niceSelect();
 			$("#innerSheetRow").find("span.current").text("Nothing");
+			$("#sheetUpdateBtn").prop("disabled", true);
 		}
 	});
 
@@ -51,24 +54,29 @@ updateSheetBtn.addEventListener("click", (e)=>{
 	const markType = $("fieldset").find("input:radio:checked").val();
 	const spreadSheetId = $("#mySheet").val();
 	const tabName = $("#myInnerSheet option:selected").text();
+	const tabId = $("#myInnerSheet option:selected").val();
 	const sheetInfo = {
 		SPREADSHEET_ID :  spreadSheetId,
-		SPREADSHEET_TAB_NAME : tabName
+		SPREADSHEET_TAB_NAME : tabName,
+		SPREADSHEET_TAB_ID : tabId
 	};
 
 	switch (markType){
 		case "youtube":
-			console.log("type youtube...")
 			$('#overlay').fadeIn().delay(300);
 			youtubeProcess(sheetInfo).then(function (){
 				$('#overlay').fadeOut();
+				$("#desc").val("");
 			});
 			break;
 		case "normal":
-			normalProcess(sheetInfo);
+			normalProcess(sheetInfo).then(()=>{
+				$('#overlay').fadeOut();
+				$("#desc").val("");
+			});
 			break;
 	}
-	//chrome.runtime.sendMessage({"data" : data, "message":"sheetUpdate"}, (response)=>console.log(`app.js response`, response))
+
 })
 
 $()
@@ -79,37 +87,59 @@ function checkYoutube(url){
 }
 
 async function youtubeProcess(sheetInfo){
-	const curretTabUrl = await getCurrentTabUrl();
+	const curretTab = await getCurrentTab();
 	const myDesc = $("#desc").val();
-	console.log("youtubeProcess...");
-	if(checkYoutube(curretTabUrl)){
-		const youtubeId = new URL(curretTabUrl).searchParams.get("v");
+	console.log("youtube Process...");
+	if(checkYoutube(curretTab.url)){
+		const youtubeId = new URL(curretTab.url).searchParams.get("v");
 		chrome.runtime.sendMessage({"youtubeId": youtubeId ,"message":"getYoutubeInfo"}, (response)=> {
 			let youtubeInfo = response.resYoutubeInfo.items[0].snippet;
+			console.log(youtubeInfo);
+			const thumbnail = {"height":youtubeInfo.thumbnails.medium.height, "width" :youtubeInfo.thumbnails.medium.width}
 			const body = {values: [[
 					new Date(), // Timestamp
 					youtubeInfo.title, // Page title
-					`=IMAGE("${youtubeInfo.thumbnails.medium.url}")`, // thumbnails
-					curretTabUrl, // Page URl
+					`=IMAGE("${youtubeInfo.thumbnails.medium.url}", 4, ${youtubeInfo.thumbnails.medium.height}, ${youtubeInfo.thumbnails.medium.width} )`, // thumbnails
+					curretTab.url, // Page URl
 					myDesc  // user disc
 				]]};
-			youtubeInfo.currentUrl = curretTabUrl;
-			chrome.runtime.sendMessage({"data" : body, "youtubeSheetInfo": sheetInfo ,"message":"sheetUpdate"}, (response)=>console.log(`app.js response`, response))
+			youtubeInfo.currentUrl = curretTab.url;
+			chrome.runtime.sendMessage({"data" : body,"thumbnail" :thumbnail , "youtubeSheetInfo": sheetInfo ,"message":"typeYoutubeSheetUpdate"}, (response)=>{
+				alert(`${response.updates.updatedRange} update success !`)
+				console.log(`app.js response`, response)
+			})
 		});
 	}else {
 		alert("not youtube watch");
 	}
 }
 
-function normalProcess(){
-	const curretTabUrl = getCurrentTabUrl();
+async function normalProcess(sheetInfo){
+	const curretTab = await getCurrentTab();
+	const myDesc = $("#desc").val();
+	console.log("normal Process..." , curretTab );
+
+	const body = {values: [[
+			new Date(), // Timestamp
+			 curretTab.title,  // Page title
+			 curretTab.url,  // thumbnails
+			 // Page URl
+			myDesc  // user disc
+		]]};
+
+	chrome.runtime.sendMessage({"data" : body, "sheetInfo": sheetInfo ,"message":"typeNormalSheetUpdate"}, (response)=>{
+		alert(`${response.updates.updatedRange} update success !`)
+		console.log(`app.js response`, response);
+	})
+
+
 }
 
-function getCurrentTabUrl(){
+function getCurrentTab(){
 	return new Promise(function (resolve, reject){
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 			let activeTab = tabs[0];
-			resolve(activeTab.url);
+			resolve(activeTab);
 		});
 	})
 }
