@@ -41,14 +41,44 @@ chrome.extension.onMessage.addListener(
 				});
 
 			} else if(request.message === 'createSheet'){
-				console.log(`sendResponse : > ${sendResponse}`);
-				gapi.client.sheets.spreadsheets.create({
-					properties: {
-						title: title
-					}
-				}).then( (response) => {
-					console.log(response)
-				});
+				fetch(`https://sheets.googleapis.com/v4/spreadsheets/${request.sheetInfo.SPREADSHEET_ID}:batchUpdate`, {
+					method: 'POST',
+					headers: {Authorization: `Bearer ${token}`},
+					body: JSON.stringify({
+						"requests": [
+							{
+								"addSheet": {
+									"properties": {
+										"title": request.sheetInfo.SPREADSHEET_TAB_NAME,
+										"gridProperties": {
+											"columnCount": 5
+										},
+										"tabColor": {
+											"red": 1.0
+										}
+									}
+								}
+							}
+						]
+					})
+				}).then((res) => {
+					const body = {values: [[
+							'thumbnails', // thumbnails
+							'Timestamp',
+							'title', // Page title
+							'url', // Page URl
+							'Description'  // user disc
+						]]};
+
+					gapi.client.sheets.spreadsheets.values.append({
+						spreadsheetId: request.sheetInfo.SPREADSHEET_ID,
+						range: request.sheetInfo.SPREADSHEET_TAB_NAME,
+						valueInputOption: 'USER_ENTERED',
+						resource: body
+					}).then((response) => {
+						sendResponse(response);
+					})
+				})
 
 
 			}else if(request.message === 'typeYoutubeSheetUpdate') {

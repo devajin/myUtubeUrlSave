@@ -38,46 +38,48 @@
 
 
             <div class="form-group">
-                <button class="btn btn-sm m-0 btn btn-outline-danger" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                <span class="badge badge-pill badge-danger btn" id="newSheetColl" disabled type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                     New Sheet
-                </button>
+                </span>
                 <div class="collapse" id="collapseExample">
                     <div class="row form-inline">
                         <label for="desc" class="col-sm-2 col-form-label">sheet Name</label>
                         <div class="col-sm-10 input-group">
                             <input type="text" class="form-control" id="addSheetInput">
-                            <button class="btn btn-dark btn-sm small pull-right m-0" disabled id="addSheetBtn">add</button>
+                            <button class="btn btn-dark btn-sm small pull-right m-0"  id="addSheetBtn">add</button>
                         </div>
                     </div>
 
                 </div>
             </div>
-            <div class="form-group row form-inline">
-                <label for="desc" class="col-sm-2 col-form-label">desc</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="desc">
-                </div>
-            </div>
-
-            <fieldset class="form-group">
-                <div class="row small">
-                    <legend class="col-form-label col-sm-2 pt-0">type</legend>
+            <div class="d-none" id="actionBlock">
+                <div class="form-group row form-inline">
+                    <label for="desc" class="col-sm-2 col-form-label">desc</label>
                     <div class="col-sm-10">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="gridRadios" id="youTubeRadio" value="youtube" checked>
-                            <label class="form-check-label" for="youTubeRadio">YouTube</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="gridRadios" id="normalRadios" value="normal">
-                            <label class="form-check-label" for="normalRadios">Normal</label>
-                        </div>
+                        <input type="text" class="form-control" id="desc">
                     </div>
                 </div>
-            </fieldset>
 
-            <div class="form-group row">
-                <div class="col text-center">
-                    <button type="button" id="sheetUpdateBtn" class="m-0 btn btn-primary" disabled>Sheet to bookMark</button>
+                <fieldset class="form-group">
+                    <div class="row small">
+                        <legend class="col-form-label col-sm-2 pt-0">type</legend>
+                        <div class="col-sm-10">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gridRadios" id="youTubeRadio" value="youtube" checked>
+                                <label class="form-check-label" for="youTubeRadio">YouTube</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gridRadios" id="normalRadios" value="normal">
+                                <label class="form-check-label" for="normalRadios">Normal</label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-group row">
+                    <div class="col text-center">
+                        <button type="button" id="sheetUpdateBtn" class="m-0 btn btn-primary" disabled>Sheet to bookMark</button>
+                    </div>
                 </div>
             </div>
         </div>
