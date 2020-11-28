@@ -80,7 +80,7 @@ createNewSheet.addEventListener("click", function (){
 	$("#collapseExample").collapse('hide');
 
 	//console.log(" sheet new create :: ",sheetInfo)
-	/*chrome.runtime.sendMessage({"sheetInfo": sheetInfo ,"message":"createSheet"}, (response)=>{
+	chrome.runtime.sendMessage({"sheetInfo": sheetInfo ,"message":"createSheet"}, (response)=>{
 		if(response.status === 200){
 			alert(`Create a new sheet success !`);
 			$mySheetSelectBox.trigger("change");
@@ -89,7 +89,7 @@ createNewSheet.addEventListener("click", function (){
 		}
 		$('#overlay').fadeOut();
 		//console.log(`app.js response`, response);
-	})*/
+	})
 	$('#overlay').fadeOut();
 });
 
@@ -107,13 +107,14 @@ updateSheetBtn.addEventListener("click", (e)=>{
 
 	switch (markType){
 		case "youtube":
-			$('#overlay').fadeIn().delay(300);
+			$('#overlay').fadeIn().delay(30);
 			youtubeProcess(sheetInfo).then(function (){
 				$('#overlay').fadeOut();
 				$("#desc").val("");
 			});
 			break;
 		case "normal":
+			$('#overlay').fadeIn().delay(30);
 			normalProcess(sheetInfo).then(()=>{
 				$('#overlay').fadeOut();
 				$("#desc").val("");
