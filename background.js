@@ -25,7 +25,7 @@ chrome.extension.onMessage.addListener(
 					})
 					.then(res => res.json())
 					.then(res => {
-						console.log(res);
+						//console.log(res);
 						sendResponse({"mySheet" : res });
 					});
 			}
@@ -94,8 +94,8 @@ chrome.extension.onMessage.addListener(
 					try {
 						await updateSheetStyle(request, token);
 						sendResponse(response.result);
-						console.log(response.result)
-						console.log(`${response.result.updates.updatedCells} cells appended.`)
+						//console.log(response.result)
+						//console.log(`${response.result.updates.updatedCells} cells appended.`)
 					}catch (e){
 						console.log(e);
 					}
@@ -111,7 +111,7 @@ chrome.extension.onMessage.addListener(
 					resource: request.data
 				}).then((response) => {
 					// On success
-					fetch(`https://sheets.googleapis.com/v4/spreadsheets/${request.sheetInfo.SPREADSHEET_ID}:batchUpdate`, {
+					/*fetch(`https://sheets.googleapis.com/v4/spreadsheets/${request.sheetInfo.SPREADSHEET_ID}:batchUpdate`, {
 						method: 'POST',
 						headers: {Authorization: `Bearer ${token}`},
 						body: JSON.stringify({
@@ -126,7 +126,7 @@ chrome.extension.onMessage.addListener(
 								}
 							]
 						})
-					}).then((res) => {return res.json()})
+					}).then((res) => {return res.json()})*/
 
 					sendResponse(response.result);
 					console.log(`${response.result.updates.updatedCells} cells appended.`)
@@ -136,7 +136,7 @@ chrome.extension.onMessage.addListener(
 				fetch(`https://youtube.googleapis.com/youtube/v3/videos?part=snippet&id=${youtubeId}&key=${API_KEY}`, {})
 					.then(res => res.json())
 					.then(res => {
-						console.log(res);
+						//console.log(res);
 						sendResponse({"resYoutubeInfo" : res });
 					});
 			}
@@ -159,8 +159,8 @@ async function updateSheetStyle(request, token){
 						"range": {
 							"sheetId": request.youtubeSheetInfo.SPREADSHEET_TAB_ID,
 							"dimension": "COLUMNS",
-							"startIndex": 2,
-							"endIndex": 3
+							"startIndex": 0,
+							"endIndex": 1
 						},"properties": {
 							"pixelSize": request.thumbnail.width
 						},
@@ -171,7 +171,8 @@ async function updateSheetStyle(request, token){
 					"updateDimensionProperties": {
 						"range": {
 							"sheetId": request.youtubeSheetInfo.SPREADSHEET_TAB_ID,
-							"dimension": "ROWS"
+							"dimension": "ROWS",
+							"startIndex": 1,
 						},
 						"properties": {
 							"pixelSize": request.thumbnail.height
@@ -179,17 +180,16 @@ async function updateSheetStyle(request, token){
 						"fields": "pixelSize"
 					}
 				},
-				{
+				/*{
 					"autoResizeDimensions": {
 						"dimensions": {
 							"sheetId": request.youtubeSheetInfo.SPREADSHEET_TAB_ID,
 							"dimension": "COLUMNS"
 						}
 					}
-				}
+				}*/
 			]
 		})
 	})
 	.then((res) => {return res.json()})
-
 }

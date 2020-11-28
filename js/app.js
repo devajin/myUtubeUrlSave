@@ -8,13 +8,13 @@ document.onload = (() => {
 	$('#overlay').fadeIn();
 
 	chrome.runtime.sendMessage({"message":"loadMySheet"}, (response)=> {
-		console.log("app.js response list :: ", response)
+		//console.log("app.js response list :: ", response)
 		let sheetPage = response.mySheet.files;
 		sheetPage.forEach((sheet) =>{
 			$mySheetSelectBox.append(`<option value=${sheet.id}>${sheet.name}</option>`)
 		});
 		$mySheetSelectBox.niceSelect();
-		$('#overlay').fadeOut()
+		$('#overlay').fadeOut();
 
 	});
 
@@ -22,7 +22,6 @@ document.onload = (() => {
 		const sheetId = $(this).val();
 		console.log(sheetId);
 		$("#addSheetInput").val("");
-		$("#newSheetColl").collapse('hide');
 
 		if(sheetId !== "0"){
 			$('#overlay').fadeIn();
@@ -36,8 +35,9 @@ document.onload = (() => {
 				$('#overlay').fadeOut();
 			});
 			$("#sheetUpdateBtn").prop("disabled", false);
-			$("#newSheetColl").prop("disabled", false).addClass("badge-danger").removeClass("badge-dark");
+			$("#newSheetColl").addClass("badge-danger").removeClass("badge-dark d-none");
 			$("#actionBlock").removeClass("d-none");
+
 		}else {
 
 			$myInnerSheetSelectBox.empty();
@@ -46,7 +46,7 @@ document.onload = (() => {
 			$myInnerSheetSelectBox.niceSelect('destroy').niceSelect();
 			$("#innerSheetRow").find("span.current").text("Nothing");
 			$("#sheetUpdateBtn").prop("disabled", true);
-			$("#newSheetColl").prop("disabled", true).addClass("badge-dark").removeClass("badge-danger");
+			$("#newSheetColl").addClass("badge-dark").removeClass("badge-danger d-none");
 			$("#actionBlock").addClass("d-none");
 		}
 	});
@@ -57,6 +57,18 @@ document.onload = (() => {
 	})
 })();
 
+
+$('#collapseExample').on('hidden.bs.collapse', function () {
+	// do something…
+	$("#actionBlock").removeClass("d-none");
+});
+
+$('#collapseExample').on('shown.bs.collapse', function () {
+	// do something…
+	$("#actionBlock").addClass("d-none");
+})
+
+
 createNewSheet.addEventListener("click", function (){
 	$('#overlay').fadeIn();
 	const spreadSheetId = $("#mySheet").val();
@@ -65,17 +77,20 @@ createNewSheet.addEventListener("click", function (){
 		SPREADSHEET_ID :  spreadSheetId,
 		SPREADSHEET_TAB_NAME : tabName
 	};
-	console.log(" sheet new create :: ",sheetInfo)
-	chrome.runtime.sendMessage({"sheetInfo": sheetInfo ,"message":"createSheet"}, (response)=>{
+	$("#collapseExample").collapse('hide');
+
+	//console.log(" sheet new create :: ",sheetInfo)
+	/*chrome.runtime.sendMessage({"sheetInfo": sheetInfo ,"message":"createSheet"}, (response)=>{
 		if(response.status === 200){
 			alert(`Create a new sheet success !`);
 			$mySheetSelectBox.trigger("change");
+			$("#newSheetColl").collapse('hide');
 
 		}
 		$('#overlay').fadeOut();
-		console.log(`app.js response`, response);
-	})
-
+		//console.log(`app.js response`, response);
+	})*/
+	$('#overlay').fadeOut();
 });
 
 
@@ -134,7 +149,7 @@ async function youtubeProcess(sheetInfo){
 			youtubeInfo.currentUrl = curretTab.url;
 			chrome.runtime.sendMessage({"data" : body,"thumbnail" :thumbnail , "youtubeSheetInfo": sheetInfo ,"message":"typeYoutubeSheetUpdate"}, (response)=>{
 				alert(`${response.updates.updatedRange} update success !`)
-				console.log(`app.js response`, response)
+				//console.log(`app.js response`, response)
 			})
 		});
 	}else {
@@ -145,7 +160,7 @@ async function youtubeProcess(sheetInfo){
 async function normalProcess(sheetInfo){
 	const curretTab = await getCurrentTab();
 	const myDesc = $("#desc").val();
-	console.log("normal Process..." , curretTab );
+	console.log("normal Process...");
 
 	const body = {values: [[
 			'',
@@ -157,7 +172,7 @@ async function normalProcess(sheetInfo){
 
 	chrome.runtime.sendMessage({"data" : body, "sheetInfo": sheetInfo ,"message":"typeNormalSheetUpdate"}, (response)=>{
 		alert(`${response.updates.updatedRange} update success !`)
-		console.log(`app.js response`, response);
+		//console.log(`app.js response`, response);
 	})
 
 
